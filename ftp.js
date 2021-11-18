@@ -1,7 +1,6 @@
-var fs = require('fs');
-var Client = require('ftp')
-var c = new Client();
-var config = {
+const fs = require('fs');
+const Client = require('ftp')
+const config = {
     "host": "",
     "port": "",
     "user": "",
@@ -14,9 +13,12 @@ var config = {
  * @param {string} savePath Save path of the downloaded file
  * @param {function} callback
  */
-function download(file, savePath, callback){  
+ function download(file, savePath, callback){ 
+    var c = new Client();
+    c.connect(config);
+
     c.on('ready', () => {
-        console.log('start: ftp download');
+        console.log('start: ftp download', file);
         c.get(file, (err, stream) => {
             if(err){
                 callback(err);
@@ -29,8 +31,6 @@ function download(file, savePath, callback){
             callback();
         });
     });
-
-    c.connect(config);
 }
 
 /**
@@ -40,21 +40,22 @@ function download(file, savePath, callback){
  * @param {function} callback
  */
 function upload(file, uploadPath, callback){
+    var c = new Client();
+    c.connect(config);
+
     c.on('ready', () => {
-        console.log('start: ftp upload');
+        console.log('start: ftp upload', file);
         c.put(file, uploadPath, (err) => {
             if(err){
                 callback(err);
                 return;
             }
-            
+
             c.end();
             console.log('complete: ftp upload');
             callback();
-        }); 
+        });
     });
-
-    c.connect(config);
 }
 
 module.exports = { download, upload }
